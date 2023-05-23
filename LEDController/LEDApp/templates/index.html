@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/styles.css') }}">
+    </head>
+    <body style="background-color: #dad7d7;">
+
+        <div class="slidecontainer">
+            <h1>Control the LED with the sliders!</h1>
+            R <input type="range" min="0" max="255" value="50" class="slider-red" id="R"><br>
+            G <input type="range" min="0" max="255" value="50" class="slider-green" id="G"><br>
+            B <input type="range" min="0" max="255" value="50" class="slider-blue" id="B"><br>
+            
+            <!--<button onclick="requestData()">Click me</button>-->
+        </div>
+        <script src = "{{ url_for('static', filename = 'js/slider.js') }}"></script>
+    </body>
+</html>
