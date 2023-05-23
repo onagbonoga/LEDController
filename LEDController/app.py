@@ -20,7 +20,8 @@ if __name__ == '__main__':
     options, _ = parser.parse_args()
 
     app.run(
-        debug=options.debug,
+        #debug=options.debug,
+        debug=True,
         host=options.host,
         port=int(options.port)
     )
