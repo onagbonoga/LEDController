@@ -21,6 +21,9 @@ def index():
         data = request.get_json() #recieve request
         if data['action'] == 1: #  write to the LED data object
             LED_data.set_values(data)
+            result = "*{:02X}{:02X}{:02X}".format(LED_data.R, LED_data.G, LED_data.B)
+            with open("result.txt","w") as file1:
+                file1.write(result)
 
         elif int(data['action']) == 0: # return the values for LED data as hex code
             result = "*{:02X}{:02X}{:02X}".format(LED_data.R, LED_data.G, LED_data.B)
@@ -29,6 +32,12 @@ def index():
 
     return render_template('index.html')
 
+@app.route('/request',methods=['GET'])
+def req():
+    file1 = open("result.txt","r")
+    result = file1.readlines()[0]
+    file1.close()
+    return result
 
 if __name__ == '__main__':
     default_port = "80"

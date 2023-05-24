@@ -25,13 +25,15 @@ B.oninput = function() {
 
 //var url = "http://127.0.0.1:5000/";
 //var url = "http://ledcontrollerapp.eba-9ctbsim3.us-east-1.elasticbeanstalk.com/";
-var url = "http://23.22.100.108/"
+var url = "http://23.22.100.108:80/"
+//var url = "http://192.168.1.4:5000/"
 function updateValues(){
     fetch(url,{
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
+    console.log("updating Values")
 }
 
 function requestData(){ 
