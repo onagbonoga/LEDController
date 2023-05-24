@@ -1,8 +1,9 @@
 import optparse 
 from flask import Flask, render_template, request
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 class LED():
     def __init__(self):
         self.R = 50
