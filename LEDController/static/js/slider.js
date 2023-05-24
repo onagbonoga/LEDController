@@ -24,7 +24,8 @@ B.oninput = function() {
 }
 
 //var url = "http://127.0.0.1:5000/";
-var url = "http://ledcontrollerapp.eba-9ctbsim3.us-east-1.elasticbeanstalk.com/";
+//var url = "http://ledcontrollerapp.eba-9ctbsim3.us-east-1.elasticbeanstalk.com/";
+var url = "http://23.22.100.108/"
 function updateValues(){
     fetch(url,{
         method: 'POST',
