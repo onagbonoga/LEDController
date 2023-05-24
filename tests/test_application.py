@@ -1,10 +1,10 @@
 import json
 import pytest
-from helloworld.application import application
+from LEDController.app import app
 
 @pytest.fixture
 def client():
-    return application.test_client()
+    return app.test_client()
 
 def test_response(client):
     assert 1
