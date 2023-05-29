@@ -1,41 +1,53 @@
 /*
-  Repeating WiFi Web Client
+  LED Controller
 
- This sketch connects to a a web server and makes a request
- using a WiFi equipped Arduino board.
+ This sketch connects to a a web server and makes request values to 
+ control an LED using a WiFi equipped Arduino board
+ 
+ by Nurudeen Agbonoga
 
- created 23 April 2012
- modified 31 May 2012
- by Tom Igoe
- modified 13 Jan 2014
- by Federico Vanzati
-
- http://www.arduino.cc/en/Tutorial/WifiWebClientRepeating
- This code is in the public domain.
+ connections
+  A0 --> Red LED
+  A1 --> Green LED
+  A2 --> Blue LED
  */
 
 #include <SPI.h>
 #include <WiFiNINA.h>
 
 #include "arduino_secrets.h" 
+// LED pins
+int red = A0;
+int green = A1;
+int blue = A2;
+int valueR;
+int valueG;
+int valueB;
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
-int keyIndex = 0;            // your network key index number (needed only for WEP)
+int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
 
-// Initialize the WiFi client library
+// Initialize the Wifi client library
 WiFiClient client;
 
 // server address:
-char server[] = "example.org";
-//IPAddress server(64,131,82,241);
+//char server[] = "ledcontrollerapp.eba-9ctbsim3.us-east-1.elasticbeanstalk.com";
+//IPAddress server(192,168,1,4);
+IPAddress server(23,22,100,108);
 
 unsigned long lastConnectionTime = 0;            // last time you connected to the server, in milliseconds
-const unsigned long postingInterval = 10L * 1000L; // delay between updates, in milliseconds
+const unsigned long postingInterval = 1L * 1000L; // delay between updates, in milliseconds
 
 void setup() {
+  //set up analog pin modes
+  pinMode(red,OUTPUT);
+  pinMode(green,OUTPUT);
+  pinMode(blue,OUTPUT);
+  
+  
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -54,7 +66,7 @@ void setup() {
     Serial.println("Please upgrade the firmware");
   }
 
-  // attempt to connect to WiFi network:
+  // attempt to connect to Wifi network:
   while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
@@ -64,8 +76,11 @@ void setup() {
     // wait 10 seconds for connection:
     delay(10000);
   }
-  // you're connected now, so print out the status:
+  // you're connected now, so print out the status and turn on LED's
   printWifiStatus();
+  analogWrite(red,50);
+  analogWrite(green,50);
+  analogWrite(blue,50);
 }
 
 void loop() {
@@ -88,21 +103,55 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void httpRequest() {
   // close any connection before send a new request.
-  // This will free the socket on the NINA module
+  // This will free the socket on the Nina module
   client.stop();
 
   // if there's a successful connection:
   if (client.connect(server, 80)) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
-    client.println("GET / HTTP/1.1");
-    client.println("Host: example.org");
+    client.println("GET /request");
     client.println("User-Agent: ArduinoWiFi/1.1");
     client.println("Connection: close");
     client.println();
 
+    // Wait for the server response
+    while (!client.available()) {
+      // Wait until data is available
+      delay(5);
+    }
+    
+    String responseString; // should only contain RGB values
+    boolean responseStarted = false;
+    while (client.available()) {
+      char c = client.read();
+      if (responseStarted)
+        responseString += c;
+      if (c == '*')
+        responseStarted = true;
+    }
+
+    Serial.println("Response: ");
+    Serial.println(responseString);
+    Serial.println("******Response end");
+
     // note the time that the connection was made:
     lastConnectionTime = millis();
+    // Convert hex code string to a long integer
+    long hexValue = strtol(responseString.c_str(), NULL, 16);
+    
+    // Extract the individual color components (R, G, and B)
+    if (responseString.length() == 6){
+      valueR = (hexValue >> 16) & 0xFF;
+      valueG = (hexValue >> 8) & 0xFF;
+      valueB = hexValue & 0xFF;
+      
+      // Use the color values to drive the LEDs
+      analogWrite(red, valueR);   
+      analogWrite(green, valueG); 
+      analogWrite(blue, valueB);
+      }
+    
   } else {
     // if you couldn't make a connection:
     Serial.println("connection failed");
